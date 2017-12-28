@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 install.packages("WikidataR")
 install.packages("stringr")
+install.packages("jsonlite")
 setwd("/Users/timkettenacker/dsproj_repos/R/dsc_context_sensitive_recommender")
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -63,5 +64,8 @@ find_enrichment_category4products <- function(cleansed_content){
 industry <- find_enrichment_category4industry(cleansed_content)
 products <- find_enrichment_category4products(cleansed_content)
 
-
+# if no match to a business term on wikipedia could be made, look for related words
+library(jsonlite)
+api_link <- paste0("https://api.datamuse.com/words?rel_gen=", "Proposal", "&topics=company&max=3")
+api_out <- fromJSON(api_link)
 
