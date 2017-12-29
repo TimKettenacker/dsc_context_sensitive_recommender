@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
-install.packages("WikidataR")
-install.packages("stringr")
-install.packages("jsonlite")
+require("WikipediR")
+require("WikidataR")
+require("stringr")
+require("jsonlite")
 setwd("/Users/timkettenacker/dsproj_repos/R/dsc_context_sensitive_recommender")
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -15,8 +16,6 @@ args <- c("Solvay","AM","BI","Proposal")
 args <- args[args != "Capgemini"]
 
 # start conditional enrichment of data
-library(WikipediR)
-library(WikidataR)
 item <- find_item("Solvay", limit = 20)
 
 # checks if any returned item fits a company description
@@ -50,7 +49,6 @@ wiki_content <- tryCatch(
 cleansed_content <- gsub("\\[|\\]|\\{|\\}", "", wiki_content$parse$wikitext$`*`) 
 
 # extracting "industry" and either "product" or "service" as enrichment categories
-library(stringr)
 find_enrichment_category4industry <- function(cleansed_content){
   industry_value <- str_extract(cleansed_content, "industry = [:alpha:]+.{0,}")
   industry_value <- sub("industry = ", "", industry_value)
@@ -65,7 +63,6 @@ industry <- find_enrichment_category4industry(cleansed_content)
 products <- find_enrichment_category4products(cleansed_content)
 
 # if no match to a business term on wikipedia could be made, look for related words
-library(jsonlite)
 api_link <- paste0("https://api.datamuse.com/words?rel_gen=", "Proposal", "&topics=company&max=3")
 api_out <- fromJSON(api_link)
 

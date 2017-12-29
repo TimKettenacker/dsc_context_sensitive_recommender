@@ -1,7 +1,6 @@
 #!/usr/bin/env Rscript
-install.packages("officer")
+require("officer")
 setwd("/Users/timkettenacker/dsproj_repos/R/dsc_context_sensitive_recommender")
-library(officer)
 
 # there is an error in the officer package which causes loops to break if trying to read any other than "pptx", like i.e. outdated "ppt"
 # apparently, it cannot be skipped in tryCatch, that's why it has to be handled beforehand
