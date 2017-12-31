@@ -21,15 +21,11 @@ item <- find_item("Solvay", limit = 20)
 # checks if any returned item fits a company description
 # and returns the wikidata item
 check4company <- function(item){
-  tryCatch(
-    for(i in 1:length(item)){
-      if((item[[i]]$description == "company")==TRUE){
-        company <- get_property(id = item[[i]]$id)
-      }
-    },error=function(e){}
-  )
-  return(company)
+    id <- grep("company", item)
+    company <- get_property(id = item[[id]]$id)
+    return(company)
 }
+
 
 company_metadata <- tryCatch(
   check4company(item)
