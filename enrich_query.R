@@ -35,7 +35,6 @@ company_metadata <- tryCatch(
 # from here, a multitude of information is accessible; most notably,
 # company_metadata[[1]]$sitelinks
 # containing the url to the company's wikipedia page
-# check out quanteda package
 wiki_content <- tryCatch(
   page_content("en", "wikipedia", page_name = company_metadata[[1]]$sitelinks$enwiki$title, as_wikitext = TRUE)
   , error=function(e){print("No sitelink found. Should be handled more gracefully.")})
