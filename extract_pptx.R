@@ -18,3 +18,5 @@ for(i in 1:length(pptx_content$file_names)){
   )
 }
 
+source("build_model.R")
+
