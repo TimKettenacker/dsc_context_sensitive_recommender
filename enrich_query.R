@@ -12,13 +12,16 @@ args <- args[args != "Capgemini"]
 
 industry <- ""
 products <- ""
-related_terms <- ""
+relevant_terms <- ""
 
 # checks if any returned item fits a company description
 # and returns the wikidata item
 check4company <- function(arg){
   item <- find_item(arg, limit = 10)
   id <- grep("company|manufacturer|corporation", item)
+  if(length(id) > 1){
+    id <- id[1]
+  }
   company <- get_property(id = item[[id]]$id)
   return(company)
 }
@@ -42,10 +45,13 @@ find_enrichment_category4products <- function(wiki_content){
   return(products_value)
 }
 
-search_related_terms <- function(arg){
-  api_link <- paste0("https://api.datamuse.com/words?rel_gen=", arg, "&topics=company&max=3")
-  api_out <- fromJSON(api_link)
-  return(api_out$word)
+check4buzzwords <- function(arg){
+  buzzwords <- c()
+  item <- find_item(arg, limit = 10)
+  for(e in 1:length(item)){
+    buzzwords <- append(buzzwords, grep("data|information|computing|distributed|processing|technology|Apache|software", item[[e]]$description, value = TRUE))
+  }
+  return(buzzwords)
 }
 
 # start conditional enrichment on user input data
@@ -58,10 +64,15 @@ for(arg in args){
     products <- append(find_enrichment_category4products(wiki_content), products)
   } # if no match to a business term on wikipedia could be made, look for related words
   else{
-    related_terms <- append(search_related_terms(arg), related_terms)
+    relevant_terms <- append(check4buzzwords(arg), relevant_terms)
   }
 }
 
-buffed_args <- paste(c(args, industry, products, related_terms))
-buffed_args <- buffed_args[buffed_args != ""] 
+buffed_args <- paste(c(args, industry, products, relevant_terms))
+
 source("extract_pptx.R")
+
+
+
+
+
