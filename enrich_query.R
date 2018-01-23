@@ -3,6 +3,7 @@ require("WikipediR")
 require("WikidataR")
 require("stringr")
 require("jsonlite")
+require("quanteda")
 setwd("/Users/timkettenacker/dsproj_repos/R/dsc_context_sensitive_recommender")
 
 # command line input is already splitted into tokens
@@ -69,6 +70,8 @@ for(arg in args){
 }
 
 buffed_args <- paste(c(args, industry, products, relevant_terms))
+buffed_args <- dfm(paste0(buffed_args, collapse = " "), remove = stopwords("english"), remove_punct = TRUE, tolower = TRUE)
+buffed_args <- featnames(buffed_args)
 
 source("extract_pptx.R")
 
