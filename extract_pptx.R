@@ -24,26 +24,43 @@ enrich_doc_title <- function(title){
   return(enriched_doc_title)
 }
 
-
 # there is an error in the officer package which causes loops to break if trying to read any other than "pptx", like i.e. outdated "ppt"
 # apparently, it cannot be skipped in tryCatch, that's why it has to be handled beforehand
-files_path <- list.files(path = "/Users/timkettenacker/Downloads/GDSCDataSet/Presentations")
-file_names <- grep("pptx", files_path, value = TRUE, fixed = TRUE)
-didnt_read <- setdiff(files_path, file_names)
+
+path <- "/Users/timkettenacker/Downloads/GDSCDataSet"
+# extract PowerPoint slides
+files_path_pptx <- list.files(path = path, pattern = ".pptx", full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
+file_names <- grep("pptx", files_path_pptx, value = TRUE, fixed = TRUE)
 pptx_content <- as.data.frame(file_names, stringsAsFactors = FALSE)
 pptx_content$content <- c("")
 pptx_content$title_enriched <- c("")
 for(i in 1:length(pptx_content$file_names)){
   tryCatch(
     slides <- data.frame(),
-    slides <- slide_summary(read_pptx(paste0("/Users/timkettenacker/Downloads/GDSCDataSet/Presentations/", pptx_content$file_names[i]))),
+    slides <- slide_summary(read_pptx(file_names[i])),
     error=function(e){},
     pptx_content$content[i] <- paste0(slides$text, collapse = " "),
     pptx_content$title_enriched[i] <- paste0(enrich_doc_title(pptx_content$file_names[i]), collapse = " ")
   )
 }
-# to-do: do this also for word
+# extract Word docs
+files_path_docx <- list.files(path = path, pattern = ".docx", full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
+file_names <- grep("docx", files_path_docx, value = TRUE, fixed = TRUE)
+docx_content <- as.data.frame(file_names, stringsAsFactors = FALSE)
+docx_content$content <- c("")
+docx_content$title_enriched <- c("")
+for(i in 1:length(docx_content$file_names)){
+  tryCatch(
+    docs <- data.frame(),
+    docs <- docx_summary(read_docx(file_names[i])),
+    error=function(e){},
+    docx_content$content[i] <- paste0(docs$text, collapse = " "),
+    docx_content$title_enriched[i] <- paste0(enrich_doc_title(docx_content$file_names[i]), collapse = " ")
+  )
+}
 
+df_content <- rbind(pptx_content, docx_content)
+df_content <- unite(df_content, corpus, content, title_enriched, sep = " ", remove = FALSE)
 
 source("build_model.R")
 
